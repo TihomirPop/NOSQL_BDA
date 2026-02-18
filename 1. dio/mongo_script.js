@@ -174,6 +174,7 @@ db.flags.find().forEach(doc => {
 print("Novi dokumenti s embedanim frekvencijama kreirani i spremljeni u kolekciju 'emb_flags'.");
 
 
+
 // 6.	Osnovni  dokument  kopirati u novi te embedati vrijednosti iz tablice 2 za svaku 
 // kontinuiranu  vrijednost kao niz :  emb2_ {ime vašeg data seta} 
 
@@ -189,3 +190,22 @@ db.flags.find().forEach(doc => {
 });
 
 print("Novi dokumenti s embedanim statistikama kreirani i spremljeni u kolekciju 'emb2_flags'.");
+
+
+
+// 7.	Iz tablice emb2 izvući sve one srednje vrijednosti  iz  nizova čija je 
+// standardna devijacija 10% > srednje vrijednosti koristeći $set modifikator
+
+db.emb2_flags.find().forEach(doc => {
+    kontinuiraneVarijable.forEach(v => {
+        const stats = doc[`stats_${v}`];
+        const [average, stdDev] = stats;
+        const isStdGt10Avg = stdDev > 1.1 * average;
+        db.emb2_flags.updateOne(
+            { _id: doc._id },
+            { $set: { [`isStdGt10Avg_${v}`]: isStdGt10Avg } }
+        );
+    });
+});
+
+print("Dodani novi flagovi za ako je standardna devijacija veca od 10% vece srednje vrijednosti u kolekciji 'emb2_flags'.");
