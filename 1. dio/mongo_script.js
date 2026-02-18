@@ -172,3 +172,20 @@ db.flags.find().forEach(doc => {
 });
 
 print("Novi dokumenti s embedanim frekvencijama kreirani i spremljeni u kolekciju 'emb_flags'.");
+
+
+// 6.	Osnovni  dokument  kopirati u novi te embedati vrijednosti iz tablice 2 za svaku 
+// kontinuiranu  vrijednost kao niz :  emb2_ {ime vašeg data seta} 
+
+db.emb2_flags.drop();
+
+db.flags.find().forEach(doc => {
+    const newDoc = { ...doc };
+    kontinuiraneVarijable.forEach(v => {
+        const statDoc = db.statistika_flags.findOne({ variable: v });
+        newDoc[`stats_${v}`] = [statDoc.average, statDoc.standardDeviation, statDoc.count];
+    });
+    db.emb2_flags.insertOne(newDoc);
+});
+
+print("Novi dokumenti s embedanim statistikama kreirani i spremljeni u kolekciju 'emb2_flags'.");
