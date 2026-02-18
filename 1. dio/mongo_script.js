@@ -154,3 +154,21 @@ kontinuiraneVarijable.forEach(v => {
 
 print("Dokumenti sa vrijednostima > srednjoj vrijednosti kreirani i spremljeni u kolekciju 'statistika2_flags'.");
 
+
+
+//5.    Osnovni  dokument  kopirati u novi te embedati vrijednosti iz tablice 3 za svaku 
+// kategoričku vrijednost, :  emb_ {ime vašeg data seta} 
+
+db.emb_flags.drop();
+
+db.flags.find().forEach(doc => {
+    const newDoc = { ...doc };
+    kategorickeVarijable.forEach(v => {
+        const val = doc[v];
+        const freqDoc = db.frekvencija_flags.findOne({ variable: v });
+        newDoc[`freq_${v}`] = freqDoc.counts[val];
+    });
+    db.emb_flags.insertOne(newDoc);
+});
+
+print("Novi dokumenti s embedanim frekvencijama kreirani i spremljeni u kolekciju 'emb_flags'.");
