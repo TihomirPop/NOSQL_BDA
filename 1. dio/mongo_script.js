@@ -21,7 +21,7 @@ kontinuiraneVarijable.forEach(v => {
         { [v]: { $exists: false } },
         { $set: { [v]: -1 } }
     );
-    print(`${v}: ${res.modifiedCount} zapisa ažurirano na -1`);
+    print(`${v}: ${res.modifiedCount} dokumenata ažurirano na -1`);
 });
 
 kategorickeVarijable.forEach(v => {
@@ -29,5 +29,38 @@ kategorickeVarijable.forEach(v => {
         { [v]: { $exists: false } },
         { $set: { [v]: "empty" } }
     );
-    print(`${v}: ${res.modifiedCount} zapisa ažurirano na "empty"`);
+    print(`${v}: ${res.modifiedCount} dokumenata ažurirano na "empty"`);
+});
+
+// 2.   Za svaku kontinuiranu vrijednost izračunati srednju vrijednost, standardnu devijaciju i kreirati novi dokument oblika
+//  sa vrijednostima, dokument nazvati:  statistika_ {ime vašeg data seta}. U izračun se uzimaju samo nomissingvrijednosti.
+
+db.statistika_flags.drop(); // Brisanje kolekcija kako bismo mogli ponovo pokrenuti skriptu bez duplikata
+
+kontinuiraneVarijable.forEach(v => {
+    db.flags.aggregate([
+        {
+            $match: { [v]: { $ne: -1 } }
+        },
+        {
+            $group: {
+                _id: null,
+                average: { $avg: `$${v}` },
+                standardDeviation: { $stdDevPop: `$${v}` },
+                count: { $sum: 1 }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                variable: v,
+                average: 1,
+                standardDeviation: 1,
+                count: 1
+            }
+        },
+        {
+            $merge: { into: "statistika_flags" }
+        }
+    ]);
 });
