@@ -209,3 +209,11 @@ db.emb2_flags.find().forEach(doc => {
 });
 
 print("Dodani novi flagovi za ako je standardna devijacija veca od 10% vece srednje vrijednosti u kolekciji 'emb2_flags'.");
+
+
+
+// 8.	Kreirati složeni indeks na originalnoj tablici i osmisliti upit koji je kompatibilan sa indeksom 
+print("Kreiranje složenog indeksa na poljima 'area' i 'population'...");
+db.flags.createIndex({ area: 1, population: -1 });
+print("Ispis svih dokumenata gdje je 'area' veća od 5000, sortirano po 'population' silazno:");
+db.flags.find({ area: { $gt: 5000 } }).sort({ population: -1 }).forEach(printjson)
