@@ -64,3 +64,19 @@ kontinuiraneVarijable.forEach(v => {
         }
     ]);
 });
+
+// 3.	Za svaku kategoričku  vrijednost izračunati frekvencije pojavnosti po obilježjima varijabli i kreirati novi dokument koristeći nizove,
+// dokument nazvati:  frekvencija_ {ime vašeg data seta} . Frekvencije računati koristeći $inc modifikator. 
+
+db.frekvencija_flags.drop();
+
+kategorickeVarijable.forEach(v => {
+    db.flags.find().forEach(doc => {
+        const val = doc[v]
+        db.frekvencija_flags.updateOne(
+            { variable: v },
+            { $inc: { [`counts.${val}`]: 1 } },
+            { upsert: true } // Kreiraj ako ne postoji
+        );
+    });
+});
