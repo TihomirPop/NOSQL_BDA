@@ -1,6 +1,8 @@
 // 0. import u MongoDB
 // mongoimport --uri="mongodb://localhost:27017" --db nosql --collection flags --type csv --file dataset/flag.data --fieldFile dataset/flag.fieldfile
 
+
+
 // 1.   Sve nedostajuće vrijednosti kontinuirane varijable zamijeniti sa -1, a kategoričke sa „empty“.
 
 const kontinuiraneVarijable = [
@@ -31,6 +33,8 @@ kategorickeVarijable.forEach(v => {
     );
     print(`${v}: ${res.modifiedCount} dokumenata ažurirano na "empty"`);
 });
+
+
 
 // 2.   Za svaku kontinuiranu vrijednost izračunati srednju vrijednost, standardnu devijaciju i kreirati novi dokument oblika
 //  sa vrijednostima, dokument nazvati:  statistika_ {ime vašeg data seta}. U izračun se uzimaju samo nomissingvrijednosti.
@@ -65,6 +69,10 @@ kontinuiraneVarijable.forEach(v => {
     ]);
 });
 
+print("Statistika za kontinuirane varijable izračunata i spremljena u kolekciju 'statistika_flags'.");
+
+
+
 // 3.	Za svaku kategoričku  vrijednost izračunati frekvencije pojavnosti po obilježjima varijabli i kreirati novi dokument koristeći nizove,
 // dokument nazvati:  frekvencija_ {ime vašeg data seta} . Frekvencije računati koristeći $inc modifikator. 
 
@@ -80,3 +88,69 @@ kategorickeVarijable.forEach(v => {
         );
     });
 });
+
+print("Frekvencije za kategoričke varijable izračunate i spremljene u kolekciju 'frekvencija_flags'.");
+
+
+
+// 4.	Iz osnovnog  dokumenta kreirati dva nova dokumenta sa kontinuiranim vrijednostima u kojoj će u 
+// prvom dokumentu   biti sadržani svi elementi <= srednje vrijednosti , a u drugom dokumentu biti 
+// sadržani svi elementi >srednje vrijednosti , dokument nazvati:  statistika1_ {ime vašeg data seta} 
+// i  statistika2_ {ime vašeg data seta} 
+
+db.statistika1_flags.drop();
+
+kontinuiraneVarijable.forEach(v => {
+    db.flags.aggregate([
+        {
+            $match: { [v]: { $lte: db.statistika_flags.findOne({ variable: v }).average } }
+        },
+        {
+            $group: {
+                _id: null,
+                values: { $push: `$${v}` }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                variable: v,
+                values: 1
+            }
+        },
+        {
+            $merge: { into: "statistika1_flags" }
+        }
+    ]);
+})
+
+print("Dokumenti sa vrijednostima <= srednjoj vrijednosti kreirani i spremljeni u kolekciju 'statistika1_flags'.");
+
+db.statistika2_flags.drop();
+
+kontinuiraneVarijable.forEach(v => {
+    db.flags.aggregate([
+        {
+            $match: { [v]: { $gt: db.statistika_flags.findOne({ variable: v }).average } }
+        },
+        {
+            $group: {
+                _id: null,
+                values: { $push: `$${v}` }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                variable: v,
+                values: 1
+            }
+        },
+        {
+            $merge: { into: "statistika2_flags" }
+        }
+    ]);
+})
+
+print("Dokumenti sa vrijednostima > srednjoj vrijednosti kreirani i spremljeni u kolekciju 'statistika2_flags'.");
+
