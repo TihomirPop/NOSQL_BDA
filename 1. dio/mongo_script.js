@@ -200,7 +200,7 @@ db.emb2_flags.find().forEach(doc => {
     kontinuiraneVarijable.forEach(v => {
         const stats = doc[`stats_${v}`];
         const [average, stdDev] = stats;
-        const isStdGt10Avg = stdDev > 1.1 * average;
+        const isStdGt10Avg = stdDev / average > 0.1; // nisam siguran kako interpretirati ovaj zadatak, ali odlučio sam ovako
         db.emb2_flags.updateOne(
             { _id: doc._id },
             { $set: { [`isStdGt10Avg_${v}`]: isStdGt10Avg } }
