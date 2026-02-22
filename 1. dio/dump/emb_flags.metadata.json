@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"a1c052bc8e444eac849f02200a7b8d3c","collectionName":"emb_flags","type":"collection"}

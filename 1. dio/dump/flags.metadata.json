@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"area":{"$numberInt":"1"},"population":{"$numberInt":"-1"}},"name":"area_1_population_-1"}],"uuid":"c75bd5a2dbd84311ae01e35afbbb4d7c","collectionName":"flags","type":"collection"}

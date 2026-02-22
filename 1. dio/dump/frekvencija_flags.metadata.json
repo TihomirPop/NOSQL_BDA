@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"993f91d1352c4edf9ae95e1a38122c6e","collectionName":"frekvencija_flags","type":"collection"}
